@@ -1,51 +1,82 @@
+import * as jsonIO from "./jsonIO";
+
+const todoList = "todolist.json";
+
+interface taskList {
+    id:number,
+    discription:string,
+    status:string
+}
+
 class TaskTracker{
-    first_arg:  string[];
-    second_arg: string[];
-    third_arg:  string[];
+    firstArg:  string[];
+    secondArg: string[];
+    thirdArg:  string[];
     commands:   Record<string, Function> = {};
 
     constructor(){
-        this.first_arg  =   process.argv.slice(2);
-        this.second_arg =   process.argv.slice(3);
-        this.third_arg  =   process.argv.slice(4);
+        this.firstArg  =   process.argv.slice(2);
+        this.secondArg =   process.argv.slice(3);
+        this.thirdArg  =   process.argv.slice(4);
         this.commands   =   {};
 
         this.setCommands();
         this.Execute();
     }
 
-    private setCommands(){
+    setCommands(){
         this.commands = {
             add:    this.addTask,
             remove: this.removeTask,
             help:   this.helpTask,
         }
     }
-
-    private addTask(){
-
-    }
-
-    private removeTask(){
-
-    }
     
-    private helpTask(){
+    helpTask(){
+        console.log(`
+Usage: task-traker [command]
 
+Commands:
+    help
+    list
+    add [userData]
+    remove [id]
+    update [id] [userData]
+        `);
+        process.exit(0);
     }
 
-    private Execute(){
-        if (this.first_arg.length === 0 || this.second_arg.length === 0 || this.first_arg[0] === "help") {
-            console.log(`
-                Usage: task-traker [command] [id] [data]
-                
-                Commands:
-                    help
-                    add
-                    remove
-                `);
+    addTask(taskDiscription: string){
+        const data: taskList[] = [
+            {id: 5, discription: "soska", status: "to do"}
+        ]
+        jsonIO.appendJsonFile(todoList, data);
+        process.exit(0);
+    }
+
+    removeTask(id: number){
+
+        process.exit(0);
+    }
+
+    Execute(){
+        if (this.firstArg.length === 0 || this.firstArg[0] === "help") {
+            this.helpTask();
+        }
+
+        const command   = this.firstArg[0];
+        const secondArg = this.secondArg[0];
+        const thirdArg = this.thirdArg[0];
+        if (command in this.commands) {
+            this.commands[command](secondArg, thirdArg);
+        }
+        else {
+            console.log("Wrong command, try: task-traker help");
+            process.exit(1);
         }
     }
 }
+
+
 
 new TaskTracker();
