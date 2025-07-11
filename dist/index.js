@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -34,7 +35,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonIO = __importStar(require("./jsonIO"));
-const todoList = "todolist.json";
+const todoListPath = "src/todolist.json";
 class TaskTracker {
     constructor() {
         this.commands = {};
@@ -49,8 +50,31 @@ class TaskTracker {
         this.commands = {
             add: this.addTask,
             remove: this.removeTask,
+            list: this.listTask,
+            update: this.updateTask,
+            mark: this.markTask,
             help: this.helpTask,
         };
+    }
+    addTask(taskDiscription) {
+        jsonIO.appendJsonFile(todoListPath, taskDiscription);
+        process.exit(0);
+    }
+    removeTask(id) {
+        jsonIO.removeJsonObject(todoListPath, id);
+        process.exit(0);
+    }
+    listTask(taskStatus) {
+        jsonIO.listJsonFile(todoListPath, taskStatus);
+        process.exit(0);
+    }
+    updateTask(id, taskDiscription) {
+        jsonIO.updateJsonObject(todoListPath, id, taskDiscription);
+        process.exit(0);
+    }
+    markTask(id, taskStatus) {
+        jsonIO.markJsonObject(todoListPath, id, taskStatus);
+        process.exit(0);
     }
     helpTask() {
         console.log(`
@@ -58,21 +82,12 @@ Usage: task-traker [command]
 
 Commands:
     help
-    list
-    add [userData]
+    list   [to-do, in-progress, done]
+    add    [userDiscription]
     remove [id]
-    update [id] [userData]
+    update [id] [userDiscription]
+    mark   [id] [userStatus]
         `);
-        process.exit(0);
-    }
-    addTask(taskDiscription) {
-        const data = [
-            { id: 5, discription: "soska", status: "to do" }
-        ];
-        jsonIO.appendJsonFile(todoList, data);
-        process.exit(0);
-    }
-    removeTask(id) {
         process.exit(0);
     }
     Execute() {

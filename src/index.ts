@@ -1,24 +1,28 @@
+#!/usr/bin/env node
+
 import * as jsonIO from "./jsonIO";
 
-const todoList = "todolist.json";
+const todoListPath = "src/todolist.json";
 
 interface taskList {
     id:number,
     discription:string,
-    status:string
+    status:string,
+    createTime: number,
+    updateTime: number
 }
 
 class TaskTracker{
     firstArg:  string[];
     secondArg: string[];
     thirdArg:  string[];
-    commands:   Record<string, Function> = {};
+    commands:  Record<string, Function> = {};
 
     constructor(){
         this.firstArg  =   process.argv.slice(2);
         this.secondArg =   process.argv.slice(3);
         this.thirdArg  =   process.argv.slice(4);
-        this.commands   =   {};
+        this.commands  =   {};
 
         this.setCommands();
         this.Execute();
@@ -28,34 +32,51 @@ class TaskTracker{
         this.commands = {
             add:    this.addTask,
             remove: this.removeTask,
+            list:   this.listTask,
+            update: this.updateTask,
+            mark:   this.markTask,
             help:   this.helpTask,
         }
     }
-    
+
+
+    addTask(taskDiscription: string){
+        jsonIO.appendJsonFile(todoListPath, taskDiscription);
+        process.exit(0);
+    }
+
+    removeTask(id: number){
+        jsonIO.removeJsonObject(todoListPath, id);
+        process.exit(0);
+    }
+
+    listTask(taskStatus: string){
+        jsonIO.listJsonFile(todoListPath, taskStatus);
+        process.exit(0);
+    }
+
+    updateTask(id: number, taskDiscription: string){
+        jsonIO.updateJsonObject(todoListPath, id, taskDiscription);
+        process.exit(0);
+    }
+
+    markTask(id:number, taskStatus: string){
+        jsonIO.markJsonObject(todoListPath, id, taskStatus);
+        process.exit(0);
+    }
+
     helpTask(){
         console.log(`
 Usage: task-traker [command]
 
 Commands:
     help
-    list
-    add [userData]
+    list   [to-do, in-progress, done]
+    add    [userDiscription]
     remove [id]
-    update [id] [userData]
+    update [id] [userDiscription]
+    mark   [id] [userStatus]
         `);
-        process.exit(0);
-    }
-
-    addTask(taskDiscription: string){
-        const data: taskList[] = [
-            {id: 5, discription: "soska", status: "to do"}
-        ]
-        jsonIO.appendJsonFile(todoList, data);
-        process.exit(0);
-    }
-
-    removeTask(id: number){
-
         process.exit(0);
     }
 
@@ -76,7 +97,5 @@ Commands:
         }
     }
 }
-
-
 
 new TaskTracker();
